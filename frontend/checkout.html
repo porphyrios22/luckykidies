@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Lucky Kidies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Fraunces:wght@500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+  :root{--pink:#E91E78;--pink-soft:#FFD9EA;--ink:#1B1B1F;--cloud:#FFFBFD;--gold:#C9A66B;--glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.7);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;color:var(--ink);background:var(--cloud);overflow-x:hidden;}
+  .blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;}
+  .blob1{width:420px;height:420px;background:var(--pink-soft);top:-120px;left:-100px;}
+  .blob2{width:380px;height:380px;background:var(--gold);opacity:0.25;top:200px;right:-140px;}
+  .blob3{width:500px;height:500px;background:var(--pink-soft);bottom:-200px;left:30%;opacity:0.4;}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--glass);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--glass-border);}
+  .logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:30px;background:linear-gradient(100deg,var(--ink) 0%,var(--ink) 35%,var(--pink) 60%,var(--pink) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-decoration:none;}
+  .logo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:13px;letter-spacing:3px;color:var(--ink);display:block;margin-top:-4px;}
+
+  .page-header{padding:60px 48px 40px;text-align:center;}
+  .eyebrow{font-size:13px;letter-spacing:3px;color:var(--pink);font-weight:500;margin-bottom:12px;}
+  .page-header h1{font-family:'Fraunces',serif;font-size:36px;font-weight:600;}
+  .page-header p{color:#888;margin-top:8px;font-size:15px;}
+
+  .checkout-layout{max-width:900px;margin:0 auto;padding:0 48px 80px;display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start;}
+
+  .form-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:24px;padding:32px;}
+  .form-card h2{font-family:'Fraunces',serif;font-size:20px;margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+  .form-group{margin-bottom:18px;}
+  .form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:8px;color:#555;}
+  .form-group input,.form-group textarea{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.8);font-family:'Outfit',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border .2s,box-shadow .2s;}
+  .form-group input:focus,.form-group textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(233,30,120,0.1);}
+  .form-group textarea{resize:vertical;min-height:90px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+  .order-summary{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:24px;padding:28px;position:sticky;top:100px;}
+  .order-summary h2{font-family:'Fraunces',serif;font-size:20px;margin-bottom:20px;}
+  .summary-item{display:flex;gap:12px;align-items:center;margin-bottom:14px;}
+  .summary-item img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:#f5f5f5;}
+  .summary-item-info{flex:1;}
+  .summary-item-info .name{font-size:13px;font-weight:500;line-height:1.3;}
+  .summary-item-info .qty{font-size:12px;color:#888;margin-top:2px;}
+  .summary-item-price{font-size:14px;font-weight:600;color:var(--pink);}
+  .divider{border:none;border-top:1px solid var(--glass-border);margin:16px 0;}
+  .summary-row{display:flex;justify-content:space-between;font-size:14px;color:#555;margin-bottom:10px;}
+  .summary-row.total{font-size:18px;font-weight:700;color:var(--ink);}
+
+  .pay-btn{width:100%;margin-top:20px;padding:16px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:16px;font-weight:600;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s,box-shadow .2s;}
+  .pay-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(233,30,120,0.35);}
+  .pay-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .secure-note{text-align:center;font-size:12px;color:#aaa;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;}
+
+  .error-msg{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#dc2626;padding:12px 16px;border-radius:12px;font-size:14px;margin-bottom:16px;display:none;}
+
+  .empty-cart{text-align:center;padding:100px 48px;}
+  .empty-cart i{font-size:48px;color:#ddd;display:block;margin-bottom:16px;}
+  .empty-cart h2{font-family:'Fraunces',serif;font-size:24px;margin-bottom:10px;}
+  .empty-cart a{display:inline-flex;align-items:center;gap:8px;margin-top:20px;padding:14px 28px;border-radius:999px;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;text-decoration:none;font-weight:600;}
+
+  @media(max-width:700px){
+    nav{padding:16px 20px;}
+    .page-header{padding:40px 20px 24px;}
+    .checkout-layout{grid-template-columns:1fr;padding:0 20px 60px;}
+    .order-summary{position:static;}
+    .form-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+
+<nav>
+  <a href="/" class="logo">Lucky Kidies<span>WEARS</span></a>
+</nav>
+
+<div class="page-header">
+  <div class="eyebrow">SECURE CHECKOUT</div>
+  <h1>Almost there!</h1>
+  <p>Fill in your details and we'll get your order to you</p>
+</div>
+
+<div id="main-content"></div>
+
+<script>
+  const CLOUDINARY_CLOUD = 'dy7sr9fph';
+  const CLOUDINARY_PRESET = 'luckykidies';
+
+  function formatPrice(p){ return '₦' + p.toLocaleString('en-NG'); }
+  function getCart(){ return JSON.parse(localStorage.getItem('lk_cart') || '[]'); }
+
+  function render() {
+    const cart = getCart();
+    const root = document.getElementById('main-content');
+
+    if (cart.length === 0) {
+      root.innerHTML = `
+        <div class="empty-cart">
+          <i class="ti ti-shopping-bag"></i>
+          <h2>Your cart is empty</h2>
+          <p style="color:#888">Add some items before checking out.</p>
+          <a href="/"><i class="ti ti-arrow-left"></i> Shop Now</a>
+        </div>`;
+      return;
+    }
+
+    const subtotal = cart.reduce((s,i) => s + i.price * i.quantity, 0);
+    const itemCount = cart.reduce((s,i) => s + i.quantity, 0);
+
+    root.innerHTML = `
+      <div class="checkout-layout">
+        <div>
+          <div class="form-card">
+            <h2><i class="ti ti-user"></i> Your Details</h2>
+            <div id="error-msg" class="error-msg"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" id="f-name" placeholder="e.g. Amaka Johnson">
+              </div>
+              <div class="form-group">
+                <label>Phone Number *</label>
+                <input type="tel" id="f-phone" placeholder="e.g. 08012345678">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email Address *</label>
+              <input type="email" id="f-email" placeholder="e.g. amaka@gmail.com">
+            </div>
+            <div class="form-group">
+              <label>Delivery Address *</label>
+              <textarea id="f-address" placeholder="e.g. 12 Bode Thomas Street, Surulere, Lagos"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-summary">
+          <h2>Order Summary</h2>
+          ${cart.map(item => `
+            <div class="summary-item">
+              <img src="${item.image_url}" alt="${item.name}">
+              <div class="summary-item-info">
+                <div class="name">${item.name}</div>
+                <div class="qty">Qty: ${item.quantity}</div>
+              </div>
+              <div class="summary-item-price">${formatPrice(item.price * item.quantity)}</div>
+            </div>
+          `).join('')}
+          <hr class="divider">
+          <div class="summary-row"><span>Subtotal (${itemCount} items)</span><span>${formatPrice(subtotal)}</span></div>
+          <div class="summary-row"><span>Delivery</span><span>TBD</span></div>
+          <div class="summary-row total"><span>Total</span><span>${formatPrice(subtotal)}</span></div>
+          <button class="pay-btn" id="pay-btn" onclick="placeOrder()">
+            <i class="ti ti-building-bank"></i> Place Order
+          </button>
+          <div class="secure-note"><i class="ti ti-lock"></i> Bank transfer · 100% secure</div>
+        </div>
+      </div>
+
+      <!-- Payment Modal -->
+      <div id="payment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:#fff;border-radius:28px;padding:36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;">
+          <div style="text-align:center;margin-bottom:24px;">
+            <div style="width:60px;height:60px;background:linear-gradient(135deg,#E91E78,#a3185e);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+              <i class="ti ti-building-bank" style="font-size:28px;color:#fff;"></i>
+            </div>
+            <h2 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:6px;">Transfer Payment</h2>
+            <p style="color:#888;font-size:14px;">Send the exact amount to the account below</p>
+          </div>
+
+          <!-- Bank details -->
+          <div style="background:#fff8fc;border:2px solid #ffd9ea;border-radius:16px;padding:20px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:13px;color:#888;">Bank</span>
+              <strong style="font-size:14px;">Moniepoint</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+              <span style="font-size:13px;color:#888;">Account Number</span>
+              <strong style="font-size:16px;color:#E91E78;letter-spacing:1px;">9157027909</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
+              <span style="font-size:13px;color:#888;">Account Name</span>
+              <strong style="font-size:14px;">Donatus Favour Chidalu</strong>
+            </div>
+            <div style="border-top:1px solid #ffd9ea;padding-top:14px;text-align:center;">
+              <p style="font-size:12px;color:#888;margin-bottom:4px;">EXACT AMOUNT TO SEND</p>
+              <p id="modal-amount" style="font-size:28px;font-weight:700;color:#E91E78;margin:0;"></p>
+            </div>
+          </div>
+
+          <div style="background:#f9f9f9;border-radius:12px;padding:14px;margin-bottom:20px;text-align:center;">
+            <p style="font-size:12px;color:#888;margin-bottom:4px;">YOUR ORDER REFERENCE</p>
+            <p id="modal-ref" style="font-size:15px;font-weight:700;color:#1B1B1F;margin:0;letter-spacing:1px;"></p>
+          </div>
+
+          <!-- Screenshot upload -->
+          <div style="margin-bottom:20px;">
+            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:10px;color:#555;">
+              Upload Payment Screenshot *
+            </label>
+            <div id="upload-area" style="border:2px dashed #e5e7eb;border-radius:14px;padding:24px;text-align:center;cursor:pointer;position:relative;background:#fafafa;">
+              <input type="file" id="screenshot-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleScreenshot(this)">
+              <i class="ti ti-camera" style="font-size:32px;color:#E91E78;opacity:0.6;display:block;margin-bottom:8px;"></i>
+              <p style="font-size:14px;color:#888;margin:0;">Tap to upload your transfer receipt</p>
+            </div>
+            <img id="screenshot-preview" style="display:none;width:100%;border-radius:12px;margin-top:12px;" alt="Receipt preview">
+            <div id="upload-progress" style="display:none;margin-top:10px;">
+              <div style="height:4px;background:#f0f0f0;border-radius:2px;">
+                <div id="upload-bar" style="height:100%;background:linear-gradient(90deg,#E91E78,#a3185e);border-radius:2px;width:0%;transition:width .3s;"></div>
+              </div>
+              <p id="upload-status" style="font-size:12px;color:#888;text-align:center;margin-top:6px;"></p>
+            </div>
+          </div>
+
+          <div id="modal-err" style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#dc2626;padding:12px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;"></div>
+
+          <button id="confirm-btn" onclick="confirmPayment()" style="width:100%;padding:16px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,#E91E78,#a3185e);color:#fff;font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;">
+            <i class="ti ti-check"></i> I've Paid — Submit Order
+          </button>
+          <button onclick="closeModal()" style="width:100%;margin-top:10px;padding:12px;border-radius:999px;border:1px solid #e5e7eb;background:transparent;font-size:14px;color:#888;cursor:pointer;font-family:'Outfit',sans-serif;">Cancel</button>
+        </div>
+      </div>`;
+  }
+
+  function showError(msg){
+    const el = document.getElementById('error-msg');
+    if(!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  let currentOrderRef = '';
+  let screenshotUrl = '';
+  let pendingOrder = null;
+
+  function makeOrderRef(){
+    return 'LK-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+  }
+
+  async function placeOrder(){
+    const name = document.getElementById('f-name').value.trim();
+    const phone = document.getElementById('f-phone').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const address = document.getElementById('f-address').value.trim();
+
+    if(!name || !phone || !email || !address){
+      showError('Please fill in all fields before proceeding.');
+      return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      showError('Please enter a valid email address.');
+      return;
+    }
+    if(!/^0[0-9]{10}$/.test(phone)){
+      showError('Please enter a valid Nigerian phone number (e.g. 08012345678).');
+      return;
+    }
+
+    const cart = getCart();
+    const total = cart.reduce((s,i) => s + i.price * i.quantity, 0);
+
+    // Nothing is saved to the server yet, and no emails fire here —
+    // this just reserves a reference number and shows payment instructions.
+    // The real order is only created once payment proof is actually submitted.
+    currentOrderRef = makeOrderRef();
+    pendingOrder = { customer_name: name, customer_email: email, customer_phone: phone, customer_address: address, total, items: cart };
+
+    document.getElementById('modal-amount').textContent = formatPrice(total);
+    document.getElementById('modal-ref').textContent = currentOrderRef;
+    document.getElementById('payment-modal').style.display = 'flex';
+  }
+
+  function closeModal(){
+    document.getElementById('payment-modal').style.display = 'none';
+  }
+
+  function handleScreenshot(input){
+    const file = input.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = document.getElementById('screenshot-preview');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    uploadScreenshot(file);
+  }
+
+  async function uploadScreenshot(file){
+    const progress = document.getElementById('upload-progress');
+    const bar = document.getElementById('upload-bar');
+    const status = document.getElementById('upload-status');
+
+    progress.style.display = 'block';
+    status.textContent = 'Uploading...';
+    bar.style.width = '0%';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+
+    let fakeProgress = 0;
+    const interval = setInterval(() => {
+      fakeProgress = Math.min(fakeProgress + 10, 85);
+      bar.style.width = fakeProgress + '%';
+    }, 200);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      clearInterval(interval);
+      const data = await res.json();
+      if(data.secure_url){
+        screenshotUrl = data.secure_url;
+        bar.style.width = '100%';
+        status.textContent = '✅ Screenshot uploaded!';
+        status.style.color = '#16a34a';
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch(err){
+      clearInterval(interval);
+      status.textContent = '❌ Upload failed. Try again.';
+      status.style.color = '#dc2626';
+    }
+  }
+
+  async function confirmPayment(){
+    if(!screenshotUrl){
+      const err = document.getElementById('modal-err');
+      err.textContent = 'Please upload your payment screenshot first.';
+      err.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ti ti-loader"></i> Submitting...';
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ ...pendingOrder, screenshot_url: screenshotUrl, payment_ref: currentOrderRef })
+      });
+
+      const data = await res.json();
+
+      if(!data.success){
+        const err = document.getElementById('modal-err');
+        err.textContent = data.error || 'Something went wrong. Please try again.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-check"></i> I\'ve Paid — Submit Order';
+        return;
+      }
+
+      // Clear cart
+      localStorage.removeItem('lk_cart');
+
+      // Redirect to processing page
+      window.location.href = `/order-processing.html?ref=${data.orderRef}`;
+
+    } catch(err){
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ti ti-check"></i> I\'ve Paid — Submit Order';
+    }
+  }
+
+  render();
+</script>
+</body>
+</html>

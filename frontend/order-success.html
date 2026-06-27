@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Lucky Kidies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Fraunces:wght@500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+  :root{--pink:#E91E78;--pink-soft:#FFD9EA;--ink:#1B1B1F;--cloud:#FFFBFD;--gold:#C9A66B;--glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.7);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;color:var(--ink);background:var(--cloud);overflow-x:hidden;min-height:100vh;}
+  .blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;}
+  .blob1{width:420px;height:420px;background:var(--pink-soft);top:-120px;left:-100px;}
+  .blob2{width:380px;height:380px;background:var(--gold);opacity:0.25;top:200px;right:-140px;}
+  .blob3{width:500px;height:500px;background:var(--pink-soft);bottom:-200px;left:30%;opacity:0.4;}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--glass);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--glass-border);}
+  .logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:30px;background:linear-gradient(100deg,var(--ink) 0%,var(--ink) 35%,var(--pink) 60%,var(--pink) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-decoration:none;}
+  .logo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:13px;letter-spacing:3px;color:var(--ink);display:block;margin-top:-4px;}
+
+  .page{max-width:600px;margin:80px auto;padding:0 24px 80px;text-align:center;}
+
+  /* Success animation */
+  .success-circle{
+    width:100px;height:100px;border-radius:50%;
+    background:linear-gradient(135deg,var(--pink),#a3185e);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 28px;
+    animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .success-circle i{font-size:48px;color:#fff;}
+  @keyframes pop{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+  .eyebrow{font-size:13px;letter-spacing:3px;color:var(--pink);font-weight:500;margin-bottom:12px;}
+  h1{font-family:'Fraunces',serif;font-size:36px;font-weight:600;margin-bottom:12px;}
+  .subtitle{font-size:15px;color:#555;line-height:1.7;margin-bottom:36px;}
+
+  /* Order card */
+  .order-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:24px;padding:28px;text-align:left;margin-bottom:24px;}
+  .order-card h2{font-family:'Fraunces',serif;font-size:18px;margin-bottom:18px;}
+  .detail-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px;color:#555;}
+  .detail-row strong{color:var(--ink);}
+  .ref-box{background:rgba(233,30,120,0.08);border:1px solid rgba(233,30,120,0.2);border-radius:12px;padding:14px 18px;margin-top:16px;text-align:center;}
+  .ref-box p{font-size:12px;color:#888;margin-bottom:4px;}
+  .ref-box strong{font-size:16px;color:var(--pink);letter-spacing:1px;}
+
+  /* What happens next */
+  .steps-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:24px;padding:28px;text-align:left;margin-bottom:24px;}
+  .steps-card h2{font-family:'Fraunces',serif;font-size:18px;margin-bottom:20px;}
+  .step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
+  .step-num{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .step-info h4{font-size:14px;font-weight:600;margin-bottom:3px;}
+  .step-info p{font-size:13px;color:#888;line-height:1.5;}
+
+  /* Buttons */
+  .action-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+  .btn-pink{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:999px;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;text-decoration:none;font-size:14px;font-weight:600;transition:transform .2s,box-shadow .2s;}
+  .btn-pink:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(233,30,120,0.3);}
+  .btn-wa{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:999px;background:#25D366;color:#fff;text-decoration:none;font-size:14px;font-weight:600;transition:transform .2s;}
+  .btn-wa:hover{transform:translateY(-2px);}
+  .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-border);color:var(--ink);text-decoration:none;font-size:14px;font-weight:600;transition:transform .2s;}
+  .btn-ghost:hover{transform:translateY(-2px);}
+
+  @media(max-width:700px){
+    nav{padding:16px 20px;}
+    .page{margin:40px auto;}
+    h1{font-size:28px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+
+<nav>
+  <a href="/" class="logo">Lucky Kidies<span>WEARS</span></a>
+</nav>
+
+<div class="page" id="page-content">
+  <!-- Filled by JS -->
+</div>
+
+<script>
+  function formatPrice(p){ return '₦' + p.toLocaleString('en-NG'); }
+
+  // Get order ref from URL: /order-success.html?ref=LK-xxx&status=PAID
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref') || params.get('transactionReference') || '';
+  const status = params.get('status') || params.get('paymentStatus') || '';
+  const amount = params.get('amount') || '';
+
+  const isPaid = status === 'PAID' || status === 'paid' || status === 'SUCCESS';
+
+  if (isPaid || ref) {
+    document.getElementById('page-content').innerHTML = `
+      <div class="success-circle"><i class="ti ti-check"></i></div>
+      <div class="eyebrow">ORDER CONFIRMED</div>
+      <h1>Your order is in! 🎉</h1>
+      <p class="subtitle">Thank you for shopping with Lucky Kidies Wears. We've received your payment and your order is being prepared.</p>
+
+      <div class="order-card">
+        <h2>Order Details</h2>
+        ${amount ? `<div class="detail-row"><span>Amount Paid</span><strong>${formatPrice(parseFloat(amount))}</strong></div>` : ''}
+        <div class="detail-row"><span>Payment Status</span><strong style="color:#16a34a">✓ Confirmed</strong></div>
+        <div class="ref-box">
+          <p>Your Order Reference</p>
+          <strong>${ref || 'Check your email'}</strong>
+        </div>
+      </div>
+
+      <div class="steps-card">
+        <h2>What happens next?</h2>
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-info">
+            <h4>Confirmation Email</h4>
+            <p>You'll receive an email with your order details shortly.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-info">
+            <h4>We Pack Your Order</h4>
+            <p>Our team will carefully pack your items within 24 hours.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-info">
+            <h4>Delivery</h4>
+            <p>We'll send you a WhatsApp message when your order is on its way.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-info">
+            <h4>Track Anytime</h4>
+            <p>Use your order reference on our <a href="/track-order.html" style="color:var(--pink)">Track Order</a> page to check your status.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-btns">
+        <a href="/" class="btn-pink"><i class="ti ti-sparkles"></i> Continue Shopping</a>
+        <a href="https://wa.me/2348094406347" target="_blank" class="btn-wa"><i class="ti ti-brand-whatsapp"></i> Chat Us</a>
+        <a href="/track-order.html" class="btn-ghost"><i class="ti ti-map-pin"></i> Track Order</a>
+      </div>
+    `;
+  } else {
+    // No valid payment params — could be a failed payment or direct visit
+    document.getElementById('page-content').innerHTML = `
+      <div style="font-size:64px;margin-bottom:20px;">🤔</div>
+      <div class="eyebrow">PAYMENT STATUS</div>
+      <h1>Something's not right</h1>
+      <p class="subtitle">We couldn't confirm your payment. This could be because the payment was cancelled or didn't go through. Your cart has not been cleared — please try again or contact us.</p>
+      <div class="action-btns">
+        <a href="/checkout.html" class="btn-pink"><i class="ti ti-arrow-left"></i> Try Again</a>
+        <a href="https://wa.me/2348094406347" target="_blank" class="btn-wa"><i class="ti ti-brand-whatsapp"></i> Contact Us</a>
+      </div>
+    `;
+  }
+</script>
+</body>
+</html>

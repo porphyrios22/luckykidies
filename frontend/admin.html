@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Lucky Kidies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Fraunces:wght@500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+  :root{--pink:#E91E78;--pink-soft:#FFD9EA;--ink:#1B1B1F;--cloud:#FFFBFD;--gold:#C9A66B;--glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.7);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;color:var(--ink);background:var(--cloud);overflow-x:hidden;}
+  .blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;}
+  .blob1{width:420px;height:420px;background:var(--pink-soft);top:-120px;left:-100px;}
+  .blob2{width:380px;height:380px;background:var(--gold);opacity:0.25;top:200px;right:-140px;}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--glass);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--glass-border);}
+  .logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:28px;background:linear-gradient(100deg,var(--ink) 0%,var(--ink) 35%,var(--pink) 60%,var(--pink) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-decoration:none;}
+  .logo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:12px;letter-spacing:3px;color:var(--ink);display:block;margin-top:-4px;}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .nav-badge{background:rgba(233,30,120,0.12);color:var(--pink);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;}
+  .store-link{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:999px;border:1px solid var(--glass-border);background:var(--glass);font-size:13px;text-decoration:none;color:var(--ink);}
+
+  .login-gate{max-width:400px;margin:120px auto;padding:0 24px;text-align:center;}
+  .login-gate h2{font-family:'Fraunces',serif;font-size:28px;margin-bottom:8px;}
+  .login-gate p{color:#888;font-size:14px;margin-bottom:28px;}
+  .login-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:24px;padding:32px;}
+  .login-card input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.7);font-family:'Outfit',sans-serif;font-size:15px;outline:none;margin-bottom:16px;}
+  .login-card input:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(233,30,120,0.12);}
+  .login-btn{width:100%;padding:14px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;}
+  .login-err{color:#dc2626;font-size:13px;margin-top:10px;display:none;}
+
+  .admin-wrap{max-width:1100px;margin:0 auto;padding:40px 24px 80px;}
+  .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+  .admin-header h1{font-family:'Fraunces',serif;font-size:26px;}
+  .add-btn{display:flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;}
+
+  .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .filter-btn{padding:7px 14px;border-radius:999px;border:1px solid var(--glass-border);background:var(--glass);font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;}
+  .filter-btn.active{background:var(--pink);color:#fff;border-color:var(--pink);}
+
+  .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+  .prod-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:20px;overflow:hidden;transition:box-shadow .2s;}
+  .prod-card:hover{box-shadow:0 8px 28px rgba(233,30,120,0.14);}
+  .prod-card-img{width:100%;height:180px;object-fit:cover;display:block;background:#f5f5f5;}
+  .prod-card-img-placeholder{width:100%;height:180px;background:linear-gradient(135deg,rgba(233,30,120,0.08),rgba(201,166,107,0.1));display:flex;align-items:center;justify-content:center;font-size:48px;color:rgba(233,30,120,0.3);}
+  .prod-card-body{padding:16px;}
+  .prod-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+  .prod-card-name{font-size:14px;font-weight:600;line-height:1.3;}
+  .prod-card-cat{font-size:11px;color:#888;margin-top:2px;}
+  .status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:500;white-space:nowrap;flex-shrink:0;}
+  .status-active{background:rgba(22,163,74,0.12);color:#16a34a;}
+  .status-soldout{background:rgba(220,38,38,0.1);color:#dc2626;}
+  .prod-card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .prod-card-price{font-size:16px;font-weight:700;color:var(--pink);}
+  .prod-card-stock{font-size:12px;color:#888;}
+  .condition-badge{padding:2px 9px;border-radius:999px;font-size:10px;font-weight:500;letter-spacing:1px;}
+  .condition-new{background:rgba(233,30,120,0.12);color:#a3185e;}
+  .condition-thrift{background:rgba(201,166,107,0.18);color:#8a6d3b;}
+  .prod-card-actions{display:flex;gap:8px;}
+  .edit-btn{flex:1;padding:9px;border-radius:10px;border:1px solid var(--glass-border);background:var(--glass);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Outfit',sans-serif;font-weight:500;transition:all .2s;}
+  .edit-btn:hover{border-color:var(--pink);color:var(--pink);}
+  .del-btn{padding:9px 12px;border-radius:10px;border:1px solid rgba(220,38,38,0.2);background:rgba(220,38,38,0.06);color:#dc2626;font-size:13px;cursor:pointer;display:flex;align-items:center;transition:background .2s;}
+  .del-btn:hover{background:rgba(220,38,38,0.14);}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:0;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:28px 28px 0 0;padding:28px 24px 40px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;position:relative;}
+  .modal-handle{width:40px;height:4px;background:#e5e7eb;border-radius:2px;margin:0 auto 20px;}
+  .modal h2{font-family:'Fraunces',serif;font-size:22px;margin-bottom:20px;}
+  .modal-close{position:absolute;top:20px;right:20px;background:none;border:none;font-size:22px;cursor:pointer;color:#aaa;}
+  .modal-close:hover{color:var(--ink);}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:13px;font-weight:500;margin-bottom:7px;color:#555;}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:13px 15px;border-radius:12px;border:1px solid #e5e7eb;background:#fafafa;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border .2s,box-shadow .2s;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(233,30,120,0.1);}
+  .form-group textarea{resize:vertical;min-height:80px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  .img-upload-area{border:2px dashed #e5e7eb;border-radius:16px;padding:28px;text-align:center;cursor:pointer;transition:border .2s,background .2s;position:relative;background:#fafafa;}
+  .img-upload-area:hover{border-color:var(--pink);background:rgba(233,30,120,0.04);}
+  .img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .img-upload-area .upload-icon{font-size:36px;color:var(--pink);opacity:0.6;margin-bottom:10px;}
+  .img-upload-area p{font-size:14px;color:#888;margin-bottom:4px;}
+  .img-upload-area small{font-size:12px;color:#bbb;}
+  .img-preview{width:100%;height:180px;object-fit:cover;border-radius:12px;display:none;margin-top:12px;}
+  .upload-progress{height:4px;background:#f0f0f0;border-radius:2px;margin-top:10px;display:none;}
+  .upload-progress-bar{height:100%;background:linear-gradient(90deg,var(--pink),#a3185e);border-radius:2px;width:0;transition:width .3s;}
+  .upload-status{font-size:12px;color:#888;margin-top:6px;text-align:center;display:none;}
+
+  .save-btn{width:100%;padding:15px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;margin-top:8px;}
+  .save-btn:disabled{opacity:0.6;cursor:not-allowed;}
+
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:#fff;padding:14px 28px;border-radius:999px;font-size:14px;font-weight:500;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:10px;white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  .loading{text-align:center;padding:60px;color:#888;}
+  .empty{text-align:center;padding:60px;color:#888;}
+
+  .tab-bar{display:flex;gap:0;border-bottom:1px solid var(--glass-border);margin-bottom:28px;}
+  .tab-btn{padding:14px 24px;border:none;background:none;font-family:'Outfit',sans-serif;font-size:15px;font-weight:500;color:#888;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px;transition:all .2s;display:flex;align-items:center;gap:8px;}
+  .tab-btn.active{color:var(--pink);border-bottom-color:var(--pink);font-weight:600;}
+  .pending-badge{background:var(--pink);color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;}
+
+  .order-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:20px;padding:20px;margin-bottom:14px;}
+  .order-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--glass-border);margin-bottom:14px;}
+  .order-refdate{display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa;}
+  .order-refdate b{color:#777;font-weight:600;letter-spacing:0.3px;}
+  .status-pill{padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.5px;flex-shrink:0;}
+  .order-main{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  .order-customer-name{font-size:16px;font-weight:600;margin-bottom:8px;}
+  .order-contact{display:flex;align-items:center;gap:7px;font-size:13px;color:#777;margin-bottom:5px;line-height:1.4;}
+  .order-contact i{color:#ccc;font-size:14px;flex-shrink:0;}
+  .order-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px;flex-shrink:0;}
+  .order-amount{font-size:20px;font-weight:700;color:var(--pink);}
+  .proof-thumb{width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--glass-border);cursor:pointer;}
+  .proof-missing{display:flex;align-items:center;gap:6px;font-size:12px;color:#dc2626;background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.15);padding:6px 10px;border-radius:8px;white-space:nowrap;}
+  .order-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border);}
+
+  @media(min-width:600px){
+    .modal-overlay{align-items:center;padding:20px;}
+    .modal{border-radius:28px;max-height:90vh;}
+    .modal-handle{display:none;}
+  }
+  @media(max-width:600px){
+    nav{padding:16px 20px;}
+    .admin-wrap{padding:24px 16px 80px;}
+    .form-row{grid-template-columns:1fr;}
+    .tab-btn{padding:12px 16px;font-size:14px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs"><div class="blob blob1"></div><div class="blob blob2"></div></div>
+
+<nav>
+  <a href="/" class="logo">Lucky Kidies<span>WEARS</span></a>
+  <div class="nav-right">
+    <span class="nav-badge"><i class="ti ti-shield"></i> Admin</span>
+    <a href="/" class="store-link"><i class="ti ti-external-link"></i> Store</a>
+  </div>
+</nav>
+
+<!-- Login Gate -->
+<div id="login-gate">
+  <div class="login-gate">
+    <h2>Admin Login</h2>
+    <p>Enter your admin password to continue</p>
+    <div class="login-card">
+      <input type="password" id="pw-input" placeholder="Password" onkeydown="if(event.key==='Enter')login()">
+      <button class="login-btn" onclick="login()">Sign In</button>
+      <div class="login-err" id="login-err">Incorrect password. Try again.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel" style="display:none">
+  <div class="admin-wrap">
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-btn-products" onclick="switchTab('products')">
+        <i class="ti ti-shirt"></i> Products
+      </button>
+      <button class="tab-btn" id="tab-btn-orders" onclick="switchTab('orders')">
+        <i class="ti ti-shopping-bag"></i> Orders
+        <span class="pending-badge" id="pending-badge" style="display:none"></span>
+      </button>
+    </div>
+
+    <!-- Products Panel -->
+    <div id="panel-products">
+      <div class="admin-header">
+        <h1>Products</h1>
+        <button class="add-btn" onclick="openAddModal()">
+          <i class="ti ti-plus"></i> Add Product
+        </button>
+      </div>
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" onclick="filterCat('all',this)">All</button>
+      </div>
+      <div class="products-grid" id="products-grid">
+        <div class="loading">Loading products...</div>
+      </div>
+    </div>
+
+    <!-- Orders Panel -->
+    <div id="panel-orders" style="display:none">
+      <div class="admin-header">
+        <h1>Orders</h1>
+        <div class="filter-bar" style="margin-bottom:0;">
+          <button class="filter-btn active" id="of-all" onclick="filterOrders('all',this)">All</button>
+          <button class="filter-btn" id="of-pending" onclick="filterOrders('pending',this)">Pending</button>
+          <button class="filter-btn" id="of-paid" onclick="filterOrders('paid',this)">Paid</button>
+          <button class="filter-btn" id="of-processing" onclick="filterOrders('processing',this)">Processing</button>
+          <button class="filter-btn" id="of-dispatched" onclick="filterOrders('dispatched',this)">Dispatched</button>
+          <button class="filter-btn" id="of-delivered" onclick="filterOrders('delivered',this)">Delivered</button>
+        </div>
+      </div>
+      <div id="orders-list" style="margin-top:20px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    <h2 id="modal-title">Add Product</h2>
+    <input type="hidden" id="edit-id">
+
+    <div class="form-group">
+      <label>Product Image</label>
+      <div class="img-upload-area" id="upload-area">
+        <input type="file" id="img-file" accept="image/*" onchange="handleImageSelect(this)">
+        <div class="upload-icon"><i class="ti ti-camera"></i></div>
+        <p>Tap to upload from your phone or computer</p>
+        <small>JPG, PNG or WEBP · Max 5MB</small>
+      </div>
+      <img id="img-preview" class="img-preview" alt="Preview">
+      <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-bar"></div></div>
+      <div class="upload-status" id="upload-status"></div>
+      <input type="hidden" id="edit-image">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Product Name *</label>
+        <input type="text" id="edit-name" placeholder="e.g. Kids Polo Shirt">
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="edit-category"></select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea id="edit-description" placeholder="Describe the product..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price (₦) *</label>
+        <input type="number" id="edit-price" placeholder="e.g. 2500">
+      </div>
+      <div class="form-group">
+        <label>Stock Quantity *</label>
+        <input type="number" id="edit-stock" placeholder="e.g. 10">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Condition</label>
+        <select id="edit-condition">
+          <option value="new">New</option>
+          <option value="thrift">Thrift</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="edit-status">
+          <option value="active">Active</option>
+          <option value="soldout">Sold Out</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="modal-err" style="color:#dc2626;font-size:13px;margin-bottom:12px;display:none;"></div>
+    <button class="save-btn" id="save-btn" onclick="saveProduct()">Save Product</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check"></i> <span id="toast-msg"></span></div>
+
+<script>
+  const ADMIN_PASS = 'luckyadmin2024';
+  const ADMIN_TOKEN = 'luckyadmin2024';
+  const CLOUDINARY_CLOUD = 'dy7sr9fph';
+  const CLOUDINARY_PRESET = 'luckykidies';
+
+  // ── Auth ──────────────────────────────────────────────
+  function login(){
+    if(document.getElementById('pw-input').value === ADMIN_PASS){
+      sessionStorage.setItem('lk_admin','1');
+      document.getElementById('login-gate').style.display='none';
+      document.getElementById('admin-panel').style.display='block';
+      init();
+    } else {
+      document.getElementById('login-err').style.display='block';
+    }
+  }
+  if(sessionStorage.getItem('lk_admin')==='1'){
+    document.getElementById('login-gate').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+  }
+
+  function adminFetch(url, options = {}) {
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...(options.headers || {}),
+        'x-admin-token': ADMIN_TOKEN
+      }
+    });
+  }
+
+  // ── Tab switching ─────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('panel-products').style.display = tab === 'products' ? 'block' : 'none';
+    document.getElementById('panel-orders').style.display = tab === 'orders' ? 'block' : 'none';
+    document.getElementById('tab-btn-products').className = 'tab-btn' + (tab === 'products' ? ' active' : '');
+    document.getElementById('tab-btn-orders').className = 'tab-btn' + (tab === 'orders' ? ' active' : '');
+    if (tab === 'orders') loadOrders();
+  }
+
+  // ── Products ──────────────────────────────────────────
+  let allProducts=[], categories=[], activeFilter='all';
+
+  async function init(){ await loadCategories(); await loadProducts(); }
+
+  async function loadCategories(){
+    const res = await fetch('/api/products/categories/all');
+    const data = await res.json();
+    categories = data.categories || [];
+    const bar = document.getElementById('filter-bar');
+    categories.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className='filter-btn';
+      btn.textContent = c.name + (c.tag ? ` (${c.tag})` : '');
+      btn.onclick = () => filterCat(c.slug, btn);
+      bar.appendChild(btn);
+    });
+    const sel = document.getElementById('edit-category');
+    sel.innerHTML = categories.map(c =>
+      `<option value="${c.id}">${c.name}${c.tag?' — '+c.tag:''}</option>`
+    ).join('');
+  }
+
+  async function loadProducts(){
+    const res = await fetch('/api/products');
+    const data = await res.json();
+    allProducts = data.products || [];
+    renderProducts();
+  }
+
+  function filterCat(slug, btn){
+    activeFilter = slug;
+    document.querySelectorAll('.filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProducts();
+  }
+
+  function renderProducts(){
+    const grid = document.getElementById('products-grid');
+    let products = activeFilter==='all' ? allProducts : allProducts.filter(p => p.slug===activeFilter);
+    if(products.length===0){ grid.innerHTML='<div class="empty">No products found.</div>'; return; }
+    grid.innerHTML = products.map(p => `
+      <div class="prod-card">
+        ${p.image_url
+          ? `<img class="prod-card-img" src="${p.image_url}" alt="${p.name}">`
+          : `<div class="prod-card-img-placeholder"><i class="ti ti-shirt"></i></div>`
+        }
+        <div class="prod-card-body">
+          <div class="prod-card-top">
+            <div>
+              <div class="prod-card-name">${p.name}</div>
+              <div class="prod-card-cat">${p.category_name}${p.tag?' · '+p.tag:''}</div>
+            </div>
+            <span class="status-badge ${p.status==='soldout'?'status-soldout':'status-active'}">
+              ${p.status==='soldout'?'Sold Out':'Active'}
+            </span>
+          </div>
+          <div class="prod-card-meta">
+            <div class="prod-card-price">₦${p.price.toLocaleString()}</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="condition-badge condition-${p.condition}">${p.condition.toUpperCase()}</span>
+              <span class="prod-card-stock">Qty: ${p.stock}</span>
+            </div>
+          </div>
+          <div class="prod-card-actions">
+            <button class="edit-btn" onclick='openEditModal(${JSON.stringify(p).replace(/'/g,"&#39;")})'>
+              <i class="ti ti-pencil"></i> Edit
+            </button>
+            <button class="del-btn" onclick="deleteProduct(${p.id})">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Orders ────────────────────────────────────────────
+  let allOrders = [];
+  let activeOrderFilter = 'all';
+
+  async function loadOrders(){
+    document.getElementById('orders-list').innerHTML = '<div class="loading">Loading orders...</div>';
+    try {
+      const res = await adminFetch('/api/orders/all');
+      const data = await res.json();
+      allOrders = data.orders || [];
+      const pending = allOrders.filter(o => o.status === 'pending').length;
+      const badge = document.getElementById('pending-badge');
+      if(pending > 0){ badge.textContent = pending; badge.style.display = 'inline'; }
+      else { badge.style.display = 'none'; }
+      renderOrders();
+    } catch(err) {
+      document.getElementById('orders-list').innerHTML = '<div class="empty">Could not load orders.</div>';
+    }
+  }
+
+  function filterOrders(status, btn){
+    activeOrderFilter = status;
+    document.querySelectorAll('[id^="of-"]').forEach(b => b.classList.remove('active'));
+    document.getElementById('of-' + status).classList.add('active');
+    renderOrders();
+  }
+
+  function formatDate(str){
+    return new Date(str).toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }
+
+  const statusColors = {
+    pending:    {bg:'rgba(234,179,8,0.12)',   color:'#a16207'},
+    paid:       {bg:'rgba(22,163,74,0.12)',   color:'#16a34a'},
+    processing: {bg:'rgba(59,130,246,0.12)',  color:'#2563eb'},
+    dispatched: {bg:'rgba(168,85,247,0.12)',  color:'#9333ea'},
+    delivered:  {bg:'rgba(22,163,74,0.18)',   color:'#15803d'},
+  };
+
+  function renderOrders(){
+    const list = document.getElementById('orders-list');
+    let orders = activeOrderFilter === 'all' ? allOrders : allOrders.filter(o => o.status === activeOrderFilter);
+    if(orders.length === 0){ list.innerHTML = '<div class="empty">No orders found.</div>'; return; }
+
+    list.innerHTML = orders.map(o => {
+      const s = statusColors[o.status] || {bg:'rgba(0,0,0,0.06)',color:'#555'};
+      const waNumber = (o.customer_phone||'').replace(/^0/,'234').replace(/\s/g,'');
+      const waText = encodeURIComponent(`Hi ${o.customer_name}, this is Lucky Kidies Wears regarding your order ${o.payment_ref}.`);
+      return `
+        <div class="order-card">
+          <div class="order-top">
+            <div class="order-refdate"><b>${o.payment_ref}</b> · ${formatDate(o.created_at)}</div>
+            <span class="status-pill" style="background:${s.bg};color:${s.color};">${o.status.toUpperCase()}</span>
+          </div>
+
+          <div class="order-main">
+            <div>
+              <div class="order-customer-name">${o.customer_name}</div>
+              <div class="order-contact"><i class="ti ti-mail"></i> ${o.customer_email}</div>
+              <div class="order-contact"><i class="ti ti-phone"></i> ${o.customer_phone}</div>
+              <div class="order-contact"><i class="ti ti-map-pin"></i> ${o.customer_address}</div>
+            </div>
+            <div class="order-side">
+              <div class="order-amount">₦${o.total.toLocaleString()}</div>
+              ${o.screenshot_url
+                ? `<img src="${o.screenshot_url}" class="proof-thumb" onclick="window.open('${o.screenshot_url}','_blank')" title="Click to view payment proof">`
+                : `<div class="proof-missing"><i class="ti ti-alert-triangle"></i> No proof</div>`
+              }
+            </div>
+          </div>
+
+          <div class="order-actions">
+            ${o.status === 'pending' ? `<button class="action-btn btn-confirm" onclick="confirmOrder(${o.id})"><i class="ti ti-check"></i> Mark as Paid</button>` : ''}
+            ${o.status === 'paid' ? `<button class="action-btn btn-processing" onclick="updateStatus(${o.id},'processing')"><i class="ti ti-package"></i> Mark as Processing</button>` : ''}
+            ${o.status === 'processing' ? `<button class="action-btn btn-dispatched" onclick="updateStatus(${o.id},'dispatched')"><i class="ti ti-truck"></i> Mark as Dispatched</button>` : ''}
+            ${o.status === 'dispatched' ? `<button class="action-btn btn-delivered" onclick="updateStatus(${o.id},'delivered')"><i class="ti ti-home-check"></i> Mark as Delivered</button>` : ''}
+            <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank" class="action-btn btn-whatsapp">
+              <i class="ti ti-brand-whatsapp"></i> WhatsApp
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function confirmOrder(id){
+    if(!confirm('Mark this order as PAID?')) return;
+    try {
+      const res = await adminFetch(`/api/orders/${id}/confirm`, { method:'POST' });
+      const data = await res.json();
+      if(data.success){ showToast('✅ Order confirmed!'); await loadOrders(); }
+      else showToast('Error: ' + (data.error || 'Something went wrong'));
+    } catch(err){ showToast('Could not confirm order.'); }
+  }
+
+
+  async function updateStatus(id, status){
+    try {
+      const res = await adminFetch(`/api/orders/${id}/status`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if(data.success){ showToast(`Order marked as ${status}!`); await loadOrders(); }
+    } catch(err){ showToast('Could not update order.'); }
+  }
+
+  // ── Cloudinary Upload ─────────────────────────────────
+  let uploadedImageUrl = '';
+
+  function handleImageSelect(input){
+    const file = input.files[0];
+    if(!file) return;
+    if(file.size > 5*1024*1024){ alert('Image must be under 5MB'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const preview = document.getElementById('img-preview');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    uploadToCloudinary(file);
+  }
+
+  async function uploadToCloudinary(file){
+    const progress = document.getElementById('upload-progress');
+    const bar = document.getElementById('upload-bar');
+    const status = document.getElementById('upload-status');
+    progress.style.display='block'; status.style.display='block';
+    status.textContent='Uploading image...'; bar.style.width='0%';
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+    let fakeProgress = 0;
+    const interval = setInterval(() => {
+      fakeProgress = Math.min(fakeProgress+8, 85);
+      bar.style.width = fakeProgress+'%';
+    }, 200);
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:formData});
+      clearInterval(interval);
+      const data = await res.json();
+      if(data.secure_url){
+        uploadedImageUrl = data.secure_url;
+        document.getElementById('edit-image').value = data.secure_url;
+        bar.style.width='100%'; status.textContent='✅ Image uploaded!'; status.style.color='#16a34a';
+        setTimeout(()=>{progress.style.display='none';status.style.display='none';},2000);
+      } else throw new Error('Upload failed');
+    } catch(err){
+      clearInterval(interval);
+      status.textContent='❌ Upload failed. Try again.'; status.style.color='#dc2626';
+    }
+  }
+
+  // ── Product Modal ─────────────────────────────────────
+  function resetUpload(){
+    uploadedImageUrl='';
+    document.getElementById('edit-image').value='';
+    document.getElementById('img-preview').style.display='none';
+    document.getElementById('img-preview').src='';
+    document.getElementById('img-file').value='';
+    document.getElementById('upload-progress').style.display='none';
+    document.getElementById('upload-status').style.display='none';
+    document.getElementById('upload-status').style.color='#888';
+  }
+
+  function openAddModal(){
+    document.getElementById('modal-title').textContent='Add Product';
+    document.getElementById('edit-id').value='';
+    document.getElementById('edit-name').value='';
+    document.getElementById('edit-description').value='';
+    document.getElementById('edit-price').value='';
+    document.getElementById('edit-stock').value='10';
+    document.getElementById('edit-condition').value='new';
+    document.getElementById('edit-status').value='active';
+    resetUpload();
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function openEditModal(p){
+    document.getElementById('modal-title').textContent='Edit Product';
+    document.getElementById('edit-id').value=p.id;
+    document.getElementById('edit-name').value=p.name;
+    document.getElementById('edit-description').value=p.description||'';
+    document.getElementById('edit-price').value=p.price;
+    document.getElementById('edit-stock').value=p.stock;
+    document.getElementById('edit-condition').value=p.condition;
+    document.getElementById('edit-status').value=p.status||'active';
+    document.getElementById('edit-category').value=p.category_id;
+    resetUpload();
+    if(p.image_url){
+      document.getElementById('edit-image').value=p.image_url;
+      uploadedImageUrl=p.image_url;
+      const preview=document.getElementById('img-preview');
+      preview.src=p.image_url; preview.style.display='block';
+    }
+    document.getElementById('modal').classList.add('open');
+  }
+
+  function closeModal(){
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('modal-err').style.display='none';
+  }
+
+  async function saveProduct(){
+    const id=document.getElementById('edit-id').value;
+    const name=document.getElementById('edit-name').value.trim();
+    const price=document.getElementById('edit-price').value;
+    const stock=document.getElementById('edit-stock').value;
+    if(!name||!price||!stock){
+      const err=document.getElementById('modal-err');
+      err.textContent='Name, price and stock are required.'; err.style.display='block'; return;
+    }
+    const body={
+      name,
+      description:document.getElementById('edit-description').value.trim(),
+      price:parseFloat(price),
+      stock:parseInt(stock),
+      image_url:document.getElementById('edit-image').value,
+      condition:document.getElementById('edit-condition').value,
+      status:document.getElementById('edit-status').value,
+      category_id:parseInt(document.getElementById('edit-category').value),
+    };
+    const btn=document.getElementById('save-btn');
+    btn.disabled=true; btn.textContent='Saving...';
+    const url=id?`/api/admin/products/${id}`:'/api/admin/products';
+    const method=id?'PUT':'POST';
+    const res=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    btn.disabled=false; btn.textContent='Save Product';
+    if(data.success){ closeModal(); showToast(id?'Product updated!':'Product added!'); await loadProducts(); }
+    else{ const err=document.getElementById('modal-err'); err.textContent=data.error||'Something went wrong.'; err.style.display='block'; }
+  }
+
+  async function deleteProduct(id){
+    if(!confirm('Delete this product? This cannot be undone.')) return;
+    const res=await fetch(`/api/admin/products/${id}`,{method:'DELETE'});
+    const data=await res.json();
+    if(data.success){ showToast('Product deleted.'); await loadProducts(); }
+  }
+
+  function showToast(msg){
+    const t=document.getElementById('toast');
+    document.getElementById('toast-msg').textContent=msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2800);
+  }
+
+  document.getElementById('modal').addEventListener('click', e => {
+    if(e.target===document.getElementById('modal')) closeModal();
+  });
+
+  if(sessionStorage.getItem('lk_admin')==='1') init();
+</script>
+</body>
+</html>

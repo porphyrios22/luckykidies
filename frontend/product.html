@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Lucky Kidies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Fraunces:wght@500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+  :root{--pink:#E91E78;--pink-soft:#FFD9EA;--ink:#1B1B1F;--cloud:#FFFBFD;--gold:#C9A66B;--glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.7);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;color:var(--ink);background:var(--cloud);overflow-x:hidden;}
+  .blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;}
+  .blob1{width:420px;height:420px;background:var(--pink-soft);top:-120px;left:-100px;}
+  .blob2{width:380px;height:380px;background:var(--gold);opacity:0.25;top:200px;right:-140px;}
+  .blob3{width:500px;height:500px;background:var(--pink-soft);bottom:-200px;left:30%;opacity:0.4;}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--glass);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--glass-border);}
+  .logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:30px;background:linear-gradient(100deg,var(--ink) 0%,var(--ink) 35%,var(--pink) 60%,var(--pink) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-decoration:none;}
+  .logo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:13px;letter-spacing:3px;color:var(--ink);display:block;margin-top:-4px;}
+  .cart-pill{display:flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(10px);padding:9px 16px;border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;color:var(--ink);}
+
+  .product-page{max-width:1000px;margin:60px auto;padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;}
+  .product-image{border-radius:24px;overflow:hidden;background:var(--glass);border:1px solid var(--glass-border);}
+  .product-image img{width:100%;height:440px;object-fit:cover;display:block;}
+
+  .breadcrumb{font-size:13px;color:#888;margin-bottom:20px;}
+  .breadcrumb a{color:var(--pink);text-decoration:none;}
+
+  .condition-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:11px;font-weight:500;letter-spacing:1px;margin-bottom:14px;}
+  .condition-thrift{background:rgba(201,166,107,0.18);color:#8a6d3b;}
+  .condition-new{background:rgba(233,30,120,0.14);color:#a3185e;}
+
+  .product-details h1{font-family:'Fraunces',serif;font-size:28px;font-weight:600;line-height:1.3;margin-bottom:12px;}
+  .product-details .price{font-size:32px;font-weight:700;color:var(--pink);margin-bottom:20px;}
+  .product-details .price span{font-size:14px;font-weight:400;color:#888;}
+  .product-details .description{font-size:15px;line-height:1.7;color:#555;margin-bottom:28px;}
+
+  .stock-info{font-size:13px;color:#888;margin-bottom:28px;}
+  .stock-info strong{color:var(--ink);}
+
+  .qty-row{display:flex;align-items:center;gap:16px;margin-bottom:24px;}
+  .qty-label{font-size:14px;font-weight:500;}
+  .qty-controls{display:flex;align-items:center;gap:0;background:var(--glass);border:1px solid var(--glass-border);border-radius:999px;overflow:hidden;}
+  .qty-btn{width:38px;height:38px;border:none;background:transparent;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .qty-btn:hover{background:rgba(233,30,120,0.1);}
+  .qty-btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .qty-btn:disabled:hover{background:transparent;}
+  .qty-display{min-width:36px;text-align:center;font-weight:600;font-size:15px;}
+
+  .add-btn{
+    width:100%;padding:16px;border-radius:999px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--pink),#a3185e);
+    color:#fff;font-size:16px;font-weight:600;font-family:'Outfit',sans-serif;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .add-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(233,30,120,0.35);}
+  .add-btn:active{transform:translateY(0);}
+  .add-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none;opacity:0.8;}
+  .soldout-msg{font-size:13px;font-weight:600;color:#dc2626;margin-bottom:28px;display:flex;align-items:center;gap:6px;}
+
+  .toast{
+    position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:var(--ink);color:#fff;padding:14px 28px;border-radius:999px;
+    font-size:14px;font-weight:500;z-index:999;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+    display:flex;align-items:center;gap:10px;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  .loading{text-align:center;padding:100px;font-size:16px;color:#888;}
+
+  @media(max-width:700px){
+    .product-page{grid-template-columns:1fr;gap:32px;padding:0 20px;margin:40px auto;}
+    .product-image img{height:300px;}
+    nav{padding:16px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="blobs">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+
+<nav>
+  <a href="/" class="logo">Lucky Kidies<span>WEARS</span></a>
+  <div>
+    <a href="/cart.html" class="cart-pill">
+      <i class="ti ti-shopping-bag"></i> Cart · <span id="cart-count">0</span>
+    </a>
+  </div>
+</nav>
+
+<div id="main-content">
+  <div class="loading">
+    <i class="ti ti-loader" style="font-size:32px;color:var(--pink);display:block;margin-bottom:12px;"></i>
+    Loading product...
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <i class="ti ti-check"></i> <span id="toast-msg">Added to cart!</span>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
+
+  let quantity = 1;
+  let product = null;
+
+  function updateCartCount() {
+    const cart = JSON.parse(localStorage.getItem('lk_cart') || '[]');
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cart-count').textContent = count;
+  }
+  updateCartCount();
+
+  function formatPrice(price) {
+    return '₦' + price.toLocaleString('en-NG');
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+function addToCart() {
+  if (product.status === 'soldout') {
+    showToast('Sorry, this item is sold out.');
+    return;
+  }
+
+  const cart = JSON.parse(localStorage.getItem('lk_cart') || '[]');
+  const existing = cart.find(i => i.id === product.id);
+  const alreadyInCart = existing ? existing.quantity : 0;
+  const maxCanAdd = product.stock - alreadyInCart;
+
+  if (maxCanAdd <= 0) {
+    showToast(`You already have all ${product.stock} in stock in your cart!`);
+    return;
+  }
+
+  if (quantity > maxCanAdd) {
+    showToast(`Only ${maxCanAdd} more available. Adjusted for you.`);
+    quantity = maxCanAdd;
+  }
+
+  if (existing) {
+    existing.quantity += quantity;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image_url: product.image_url,
+      condition: product.condition,
+      stock: product.stock,
+      quantity
+    });
+  }
+  localStorage.setItem('lk_cart', JSON.stringify(cart));
+  updateCartCount();
+  showToast(`${product.name} added to cart!`);
+}
+
+  function updateQty(change) {
+    quantity = Math.max(1, Math.min(product.stock, quantity + change));
+    document.getElementById('qty-display').textContent = quantity;
+  }
+
+  async function loadProduct() {
+    if (!productId) {
+      document.getElementById('main-content').innerHTML = '<div class="loading">No product selected.</div>';
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/products/${productId}`);
+      const data = await res.json();
+
+      if (!data.success) {
+        document.getElementById('main-content').innerHTML = '<div class="loading">Product not found.</div>';
+        return;
+      }
+
+      product = data.product;
+      document.title = product.name + ' — Lucky Kidies';
+
+      document.getElementById('main-content').innerHTML = `
+        <div class="product-page">
+          <div class="product-image">
+            <img src="${product.image_url}" alt="${product.name}">
+          </div>
+          <div class="product-details">
+            <div class="breadcrumb">
+              <a href="/">Home</a> ›
+              <a href="/category.html?cat=${product.slug}">${product.category_name}</a> ›
+              ${product.name}
+            </div>
+            <span class="condition-badge condition-${product.condition}">${product.condition.toUpperCase()}</span>
+            <h1>${product.name}</h1>
+            <div class="price">${formatPrice(product.price)} <span>NGN</span></div>
+            <p class="description">${product.description}</p>
+            ${product.status === 'soldout'
+              ? `<div class="soldout-msg"><i class="ti ti-alert-circle"></i> Currently sold out</div>`
+              : `<div class="stock-info">In stock: <strong>${product.stock} available</strong></div>`
+            }
+            <div class="qty-row">
+              <span class="qty-label">Quantity:</span>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="updateQty(-1)" ${product.status === 'soldout' ? 'disabled' : ''}>−</button>
+                <span class="qty-display" id="qty-display">1</span>
+                <button class="qty-btn" onclick="updateQty(1)" ${product.status === 'soldout' ? 'disabled' : ''}>+</button>
+              </div>
+            </div>
+            <button class="add-btn" onclick="addToCart()" ${product.status === 'soldout' ? 'disabled' : ''}>
+              <i class="ti ${product.status === 'soldout' ? 'ti-ban' : 'ti-shopping-bag'}"></i> ${product.status === 'soldout' ? 'Sold Out' : 'Add to Cart'}
+            </button>
+          </div>
+        </div>
+      `;
+    } catch (err) {
+      document.getElementById('main-content').innerHTML = '<div class="loading">Could not load product.</div>';
+    }
+  }
+
+  loadProduct();
+</script>
+</body>
+</html>

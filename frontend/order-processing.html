@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Processing — Lucky Kidies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Fraunces:wght@500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+  :root{--pink:#E91E78;--pink-soft:#FFD9EA;--ink:#1B1B1F;--cloud:#FFFBFD;--gold:#C9A66B;--glass:rgba(255,255,255,0.55);--glass-border:rgba(255,255,255,0.7);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Outfit',sans-serif;color:var(--ink);background:var(--cloud);overflow-x:hidden;min-height:100vh;}
+  .blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:0.5;}
+  .blob1{width:420px;height:420px;background:var(--pink-soft);top:-120px;left:-100px;}
+  .blob2{width:380px;height:380px;background:var(--gold);opacity:0.25;top:200px;right:-140px;}
+  nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 48px;background:var(--glass);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid var(--glass-border);}
+  .logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:30px;background:linear-gradient(100deg,var(--ink) 0%,var(--ink) 35%,var(--pink) 60%,var(--pink) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-decoration:none;}
+  .logo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:13px;letter-spacing:3px;color:var(--ink);display:block;margin-top:-4px;}
+  .page{max-width:560px;margin:80px auto;padding:0 24px 80px;text-align:center;}
+  .pulse-ring{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--pink),#a3185e);display:flex;align-items:center;justify-content:center;margin:0 auto 28px;position:relative;animation:pulse 2s infinite;}
+  .pulse-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:3px solid var(--pink);opacity:0.4;animation:ping 2s infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+  @keyframes ping{0%{transform:scale(1);opacity:0.4;}100%{transform:scale(1.3);opacity:0;}}
+  .eyebrow{font-size:13px;letter-spacing:3px;color:var(--pink);font-weight:500;margin-bottom:12px;}
+  h1{font-family:'Fraunces',serif;font-size:32px;font-weight:600;margin-bottom:12px;}
+  .subtitle{font-size:15px;color:#555;line-height:1.7;margin-bottom:36px;}
+  .ref-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:20px;padding:24px;margin-bottom:24px;}
+  .ref-card p{font-size:12px;color:#888;letter-spacing:1px;margin-bottom:6px;}
+  .ref-card strong{font-size:18px;color:var(--pink);letter-spacing:1px;}
+  .steps{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:20px;padding:24px;text-align:left;margin-bottom:24px;}
+  .steps h3{font-family:'Fraunces',serif;font-size:17px;margin-bottom:16px;}
+  .step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
+  .step-dot{width:8px;height:8px;border-radius:50%;background:var(--pink);flex-shrink:0;margin-top:6px;}
+  .step p{font-size:14px;color:#555;line-height:1.6;margin:0;}
+  .action-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .btn-pink{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:999px;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;text-decoration:none;font-size:14px;font-weight:600;}
+  .btn-wa{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:999px;background:#25D366;color:#fff;text-decoration:none;font-size:14px;font-weight:600;}
+  @media(max-width:700px){nav{padding:16px 20px;}.page{margin:40px auto;}}
+</style>
+</head>
+<body>
+<div class="blobs"><div class="blob blob1"></div><div class="blob blob2"></div></div>
+<nav>
+  <a href="/" class="logo">Lucky Kidies<span>WEARS</span></a>
+</nav>
+<div class="page">
+  <div class="pulse-ring"><i class="ti ti-clock" style="font-size:44px;color:#fff;"></i></div>
+  <div class="eyebrow">ORDER SUBMITTED</div>
+  <h1>We're verifying your payment</h1>
+  <p class="subtitle">Your order has been received and your payment screenshot has been sent to us. We'll confirm your payment within a few hours and send you an email.</p>
+
+  <div class="ref-card">
+    <p>YOUR ORDER REFERENCE</p>
+    <strong id="order-ref">—</strong>
+  </div>
+
+  <div class="steps">
+    <h3>What's happening now</h3>
+    <div class="step"><div class="step-dot"></div><p>We've received your order and payment proof.</p></div>
+    <div class="step"><div class="step-dot"></div><p>Our team will verify your bank transfer shortly.</p></div>
+    <div class="step"><div class="step-dot"></div><p>Once confirmed you'll get an email and we'll start packing.</p></div>
+    <div class="step"><div class="step-dot"></div><p>Track your order anytime using your reference number.</p></div>
+  </div>
+
+  <div class="action-btns">
+    <a href="/track-order.html" class="btn-pink"><i class="ti ti-map-pin"></i> Track Order</a>
+    <a href="https://wa.me/2348094406347" target="_blank" class="btn-wa"><i class="ti ti-brand-whatsapp"></i> Chat Us</a>
+  </div>
+</div>
+<script>
+  const ref = new URLSearchParams(window.location.search).get('ref');
+  if(ref) document.getElementById('order-ref').textContent = ref;
+</script>
+</body>
+</html>

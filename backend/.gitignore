@@ -1,0 +1,5 @@
+node_modules/
+.env
+db/luckykidies.db
+ADMIN_PASSWORD=1ucky@dmiN2026$
+ADMIN_SECRET=1ucky@dmiN2026$1ucky@dmiN2026$
