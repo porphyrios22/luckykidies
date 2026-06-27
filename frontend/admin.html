@@ -639,6 +639,7 @@
       status:document.getElementById('edit-status').value,
       category_id:parseInt(document.getElementById('edit-category').value),
     };
+    
     const btn=document.getElementById('save-btn');
     btn.disabled=true; btn.textContent='Saving...';
     const url=id?`/api/admin/products/${id}`:'/api/admin/products';
