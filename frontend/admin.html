@@ -169,6 +169,9 @@
         <i class="ti ti-shopping-bag"></i> Orders
         <span class="pending-badge" id="pending-badge" style="display:none"></span>
       </button>
+      <button class="tab-btn" id="tab-btn-track" onclick="switchTab('track')">
+        <i class="ti ti-search"></i> Track Order
+      </button>
     </div>
 
     <!-- Products Panel -->
@@ -201,6 +204,25 @@
         </div>
       </div>
       <div id="orders-list" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- Track Panel -->
+    <div id="panel-track" style="display:none">
+      <div class="admin-header"><h1>Track Order</h1></div>
+      <div style="max-width:520px;margin-top:8px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="text" id="track-ref-input"
+            placeholder="Enter order reference e.g. LK-1719400000-ABC12"
+            oninput="this.value=this.value.toUpperCase()"
+            onkeydown="if(event.key==='Enter')adminTrackOrder()"
+            style="flex:1;padding:13px 16px;border-radius:14px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.8);font-family:'Outfit',sans-serif;font-size:15px;outline:none;">
+          <button onclick="adminTrackOrder()"
+            style="padding:13px 22px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:14px;font-weight:600;font-family:'Outfit',sans-serif;white-space:nowrap;">
+            <i class="ti ti-search"></i> Search
+          </button>
+        </div>
+        <div id="track-result" style="margin-top:20px;"></div>
+      </div>
     </div>
 
   </div>
@@ -333,8 +355,10 @@
   function switchTab(tab) {
     document.getElementById('panel-products').style.display = tab === 'products' ? 'block' : 'none';
     document.getElementById('panel-orders').style.display = tab === 'orders' ? 'block' : 'none';
+    document.getElementById('panel-track').style.display = tab === 'track' ? 'block' : 'none';
     document.getElementById('tab-btn-products').className = 'tab-btn' + (tab === 'products' ? ' active' : '');
     document.getElementById('tab-btn-orders').className = 'tab-btn' + (tab === 'orders' ? ' active' : '');
+    document.getElementById('tab-btn-track').className = 'tab-btn' + (tab === 'track' ? ' active' : '');
     if (tab === 'orders') loadOrders();
   }
 
@@ -639,7 +663,6 @@
       status:document.getElementById('edit-status').value,
       category_id:parseInt(document.getElementById('edit-category').value),
     };
-    
     const btn=document.getElementById('save-btn');
     btn.disabled=true; btn.textContent='Saving...';
     const url=id?`/api/admin/products/${id}`:'/api/admin/products';
@@ -656,6 +679,60 @@
     const res=await adminFetch(`/api/admin/products/${id}`,{method:'DELETE'});
     const data=await res.json();
     if(data.success){ showToast('Product deleted.'); await loadProducts(); }
+  }
+
+  async function adminTrackOrder() {
+    const ref = document.getElementById('track-ref-input').value.trim();
+    if (!ref) { showToast('Enter an order reference first.'); return; }
+    const resultEl = document.getElementById('track-result');
+    resultEl.innerHTML = '<p style="color:#888;font-size:14px;">Searching...</p>';
+    try {
+      const res = await adminFetch(`/api/orders/track?ref=${encodeURIComponent(ref)}`);
+      const data = await res.json();
+      if (!data.success || !data.order) {
+        resultEl.innerHTML = '<div style="background:#fff5f5;border:1px solid #fecaca;border-radius:16px;padding:20px;text-align:center;color:#dc2626;font-size:14px;"><i class="ti ti-mood-sad" style="font-size:28px;display:block;margin-bottom:8px;"></i>No order found for that reference.</div>';
+        return;
+      }
+      const o = data.order;
+      const statusColors = { pending:'#a16207', paid:'#16a34a', processing:'#2563eb', dispatched:'#9333ea', delivered:'#15803d' };
+      const statusBg = { pending:'rgba(234,179,8,0.12)', paid:'rgba(22,163,74,0.12)', processing:'rgba(59,130,246,0.12)', dispatched:'rgba(168,85,247,0.12)', delivered:'rgba(22,163,74,0.18)' };
+      const color = statusColors[o.status] || '#555';
+      const bg = statusBg[o.status] || 'rgba(0,0,0,0.06)';
+      const itemsHtml = (o.items || []).map(i => `
+        <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,0.06);">
+          <div><span style="font-weight:500;">${i.name}</span> <span style="color:#888;">×${i.quantity}</span></div>
+          <span style="font-weight:600;color:var(--pink);">₦${(i.price * i.quantity).toLocaleString()}</span>
+        </div>`).join('');
+      const waNumber = (o.customer_phone||'').replace(/^0/,'234').replace(/\s/g,'');
+      const waText = encodeURIComponent(`Hi ${o.customer_name}, this is Lucky Kidies Wears regarding your order ${o.payment_ref}.`);
+      resultEl.innerHTML = `
+        <div style="background:rgba(255,255,255,0.55);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.7);border-radius:20px;padding:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:600;">${o.customer_name}</div>
+              <div style="font-size:13px;color:#888;margin-top:2px;">${o.payment_ref}</div>
+            </div>
+            <span style="padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:1px;background:${bg};color:${color};">${o.status.toUpperCase()}</span>
+          </div>
+          <div style="font-size:14px;color:#555;line-height:2;margin-bottom:16px;">
+            <div>📧 ${o.customer_email}</div>
+            <div>📞 ${o.customer_phone}</div>
+            <div>📍 ${o.customer_address}</div>
+            <div>🗓 ${new Date(o.created_at).toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'})}</div>
+            <div>💰 <strong>₦${o.total.toLocaleString()}</strong></div>
+          </div>
+          ${itemsHtml}
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+            <a href="https://wa.me/${waNumber}?text=${waText}" target="_blank"
+              style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:999px;background:#25D366;color:#fff;text-decoration:none;font-size:13px;font-weight:600;">
+              <i class="ti ti-brand-whatsapp"></i> WhatsApp
+            </a>
+            ${o.screenshot_url ? `<a href="${o.screenshot_url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:999px;background:rgba(233,30,120,0.1);color:var(--pink);text-decoration:none;font-size:13px;font-weight:600;"><i class="ti ti-photo"></i> View Payment Proof</a>` : ''}
+          </div>
+        </div>`;
+    } catch(err) {
+      resultEl.innerHTML = '<p style="color:#dc2626;font-size:14px;">Something went wrong. Try again.</p>';
+    }
   }
 
   function showToast(msg){

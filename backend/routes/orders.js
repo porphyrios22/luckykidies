@@ -118,12 +118,29 @@ router.post('/:id/status', requireAdmin, (req, res) => {
 router.get('/track', (req, res) => {
   try {
     const { ref, email } = req.query;
-    if (!ref || !email) return res.status(400).json({ success: false, error: 'Missing ref or email' });
+    if (!ref) return res.status(400).json({ success: false, error: 'Missing order reference' });
 
-    const order = db.prepare(`
-      SELECT * FROM orders
-      WHERE payment_ref = ? AND LOWER(customer_email) = LOWER(?)
-    `).get(ref, email);
+    let order;
+    if (email) {
+      // Public lookup: ref + email required
+      order = db.prepare(`
+        SELECT * FROM orders
+        WHERE payment_ref = ? AND LOWER(customer_email) = LOWER(?)
+      `).get(ref, email);
+    } else {
+      // Ref-only: admin token required
+      const token = req.headers['x-admin-token'];
+      if (!token) return res.status(401).json({ success: false, error: 'Email required' });
+      try {
+        const jwt = require('jsonwebtoken');
+        jwt.verify(token, process.env.ADMIN_SECRET);
+      } catch(e) {
+        return res.status(401).json({ success: false, error: 'Invalid token' });
+      }
+      order = db.prepare(`
+        SELECT * FROM orders WHERE payment_ref = ?
+      `).get(ref);
+    }
 
     if (!order) return res.json({ success: false });
 
@@ -138,5 +155,6 @@ router.get('/track', (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
 
 module.exports = router;
