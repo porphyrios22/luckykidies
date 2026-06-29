@@ -94,6 +94,12 @@
   const CLOUDINARY_PRESET = 'luckykidies';
 
   function formatPrice(p){ return '₦' + p.toLocaleString('en-NG'); }
+
+  // Resize/optimize a Cloudinary URL on the fly (f_auto,q_auto = best format/compression per browser)
+  function cldUrl(url, width){
+    if(!url || !url.includes('/upload/')) return url;
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+  }
   function getCart(){ return JSON.parse(localStorage.getItem('lk_cart') || '[]'); }
 
   function render() {
@@ -145,7 +151,7 @@
           <h2>Order Summary</h2>
           ${cart.map(item => `
             <div class="summary-item">
-              <img src="${item.image_url}" alt="${item.name}">
+              <img src="${cldUrl(item.image_url, 150)}" alt="${item.name}">
               <div class="summary-item-info">
                 <div class="name">${item.name}</div>
                 <div class="qty">Qty: ${item.quantity}</div>

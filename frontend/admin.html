@@ -302,6 +302,12 @@
   const CLOUDINARY_CLOUD = 'dy7sr9fph';
   const CLOUDINARY_PRESET = 'luckykidies';
 
+  // Resize/optimize a Cloudinary URL on the fly (f_auto,q_auto = best format/compression per browser)
+  function cldUrl(url, width){
+    if(!url || !url.includes('/upload/')) return url;
+    return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
+  }
+
   // ── Auth ──────────────────────────────────────────────
   function getToken() {
     return sessionStorage.getItem('lk_admin_token');
@@ -403,7 +409,7 @@
     grid.innerHTML = products.map(p => `
       <div class="prod-card">
         ${p.image_url
-          ? `<img class="prod-card-img" src="${p.image_url}" alt="${p.name}">`
+          ? `<img class="prod-card-img" src="${cldUrl(p.image_url, 300)}" alt="${p.name}">`
           : `<div class="prod-card-img-placeholder"><i class="ti ti-shirt"></i></div>`
         }
         <div class="prod-card-body">
@@ -557,7 +563,7 @@
       if(url){
         html += `
           <div class="img-slot filled">
-            <img src="${url}" alt="Product image ${i+1}">
+            <img src="${cldUrl(url, 200)}" alt="Product image ${i+1}">
             ${i===0 ? '<span class="primary-badge">Main</span>' : ''}
             <button type="button" class="img-remove" onclick="removeImage(${i})"><i class="ti ti-x"></i></button>
           </div>`;
