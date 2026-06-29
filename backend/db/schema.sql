@@ -22,6 +22,15 @@ status TEXT DEFAULT 'active',
   FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
+-- Product images table (up to 5 per product)
+CREATE TABLE IF NOT EXISTS product_images (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_id INTEGER NOT NULL,
+  url TEXT NOT NULL,
+  position INTEGER DEFAULT 0,
+  FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
 -- Orders table
 CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

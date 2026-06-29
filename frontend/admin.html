@@ -78,13 +78,15 @@
   .form-group textarea{resize:vertical;min-height:80px;}
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
-  .img-upload-area{border:2px dashed #e5e7eb;border-radius:16px;padding:28px;text-align:center;cursor:pointer;transition:border .2s,background .2s;position:relative;background:#fafafa;}
-  .img-upload-area:hover{border-color:var(--pink);background:rgba(233,30,120,0.04);}
-  .img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-  .img-upload-area .upload-icon{font-size:36px;color:var(--pink);opacity:0.6;margin-bottom:10px;}
-  .img-upload-area p{font-size:14px;color:#888;margin-bottom:4px;}
-  .img-upload-area small{font-size:12px;color:#bbb;}
-  .img-preview{width:100%;height:180px;object-fit:cover;border-radius:12px;display:none;margin-top:12px;}
+  .img-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .img-slot{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;}
+  .img-slot.empty{border:2px dashed #e5e7eb;background:#fafafa;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border .2s,background .2s,opacity .2s;color:var(--pink);font-size:22px;opacity:0.55;}
+  .img-slot.empty:hover{border-color:var(--pink);background:rgba(233,30,120,0.04);opacity:1;}
+  .img-slot.filled img{width:100%;height:100%;object-fit:cover;display:block;}
+  .img-slot .primary-badge{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;padding:2px 8px;border-radius:999px;font-weight:500;}
+  .img-slot .img-remove{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;line-height:1;}
+  .img-slot .img-remove:hover{background:#dc2626;}
+  .img-hint{display:block;font-size:12px;color:#bbb;margin-top:8px;}
   .upload-progress{height:4px;background:#f0f0f0;border-radius:2px;margin-top:10px;display:none;}
   .upload-progress-bar{height:100%;background:linear-gradient(90deg,var(--pink),#a3185e);border-radius:2px;width:0;transition:width .3s;}
   .upload-status{font-size:12px;color:#888;margin-top:6px;text-align:center;display:none;}
@@ -237,17 +239,12 @@
     <input type="hidden" id="edit-id">
 
     <div class="form-group">
-      <label>Product Image</label>
-      <div class="img-upload-area" id="upload-area">
-        <input type="file" id="img-file" accept="image/*" onchange="handleImageSelect(this)">
-        <div class="upload-icon"><i class="ti ti-camera"></i></div>
-        <p>Tap to upload from your phone or computer</p>
-        <small>JPG, PNG or WEBP · Max 5MB</small>
-      </div>
-      <img id="img-preview" class="img-preview" alt="Preview">
+      <label>Product Images</label>
+      <div class="img-slots" id="img-slots"></div>
+      <small class="img-hint">Tap a square to add a photo · up to 5 · first one is the main image shown on the shop</small>
+      <input type="file" id="img-file" accept="image/*" style="display:none" onchange="handleImageSelect(this)">
       <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-bar"></div></div>
       <div class="upload-status" id="upload-status"></div>
-      <input type="hidden" id="edit-image">
     </div>
 
     <div class="form-row">
@@ -547,20 +544,47 @@
     } catch(err){ showToast('Could not update order.'); }
   }
 
-  // ── Cloudinary Upload ─────────────────────────────────
-  let uploadedImageUrl = '';
+  // ── Cloudinary Upload (up to 5 images per product) ────
+  const MAX_IMAGES = 5;
+  let productImages = [];   // ordered array of uploaded URLs, index 0 = primary
+  let activeSlotIndex = null;
+
+  function renderImageSlots(){
+    const container = document.getElementById('img-slots');
+    let html = '';
+    for(let i=0;i<MAX_IMAGES;i++){
+      const url = productImages[i];
+      if(url){
+        html += `
+          <div class="img-slot filled">
+            <img src="${url}" alt="Product image ${i+1}">
+            ${i===0 ? '<span class="primary-badge">Main</span>' : ''}
+            <button type="button" class="img-remove" onclick="removeImage(${i})"><i class="ti ti-x"></i></button>
+          </div>`;
+      } else if(i === productImages.length){
+        html += `
+          <div class="img-slot empty" onclick="triggerUpload(${i})">
+            <i class="ti ti-plus"></i>
+          </div>`;
+      }
+    }
+    container.innerHTML = html;
+  }
+
+  function triggerUpload(index){
+    activeSlotIndex = index;
+    document.getElementById('img-file').click();
+  }
+
+  function removeImage(index){
+    productImages.splice(index,1);
+    renderImageSlots();
+  }
 
   function handleImageSelect(input){
     const file = input.files[0];
     if(!file) return;
-    if(file.size > 5*1024*1024){ alert('Image must be under 5MB'); return; }
-    const reader = new FileReader();
-    reader.onload = e => {
-      const preview = document.getElementById('img-preview');
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    if(file.size > 5*1024*1024){ alert('Image must be under 5MB'); input.value=''; return; }
     uploadToCloudinary(file);
   }
 
@@ -569,7 +593,7 @@
     const bar = document.getElementById('upload-bar');
     const status = document.getElementById('upload-status');
     progress.style.display='block'; status.style.display='block';
-    status.textContent='Uploading image...'; bar.style.width='0%';
+    status.textContent='Uploading image...'; status.style.color='#888'; bar.style.width='0%';
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', CLOUDINARY_PRESET);
@@ -583,27 +607,29 @@
       clearInterval(interval);
       const data = await res.json();
       if(data.secure_url){
-        uploadedImageUrl = data.secure_url;
-        document.getElementById('edit-image').value = data.secure_url;
+        const slot = activeSlotIndex !== null ? activeSlotIndex : productImages.length;
+        productImages[slot] = data.secure_url;
+        renderImageSlots();
         bar.style.width='100%'; status.textContent='✅ Image uploaded!'; status.style.color='#16a34a';
-        setTimeout(()=>{progress.style.display='none';status.style.display='none';},2000);
+        setTimeout(()=>{progress.style.display='none';status.style.display='none';},1500);
       } else throw new Error('Upload failed');
     } catch(err){
       clearInterval(interval);
       status.textContent='❌ Upload failed. Try again.'; status.style.color='#dc2626';
     }
+    document.getElementById('img-file').value='';
+    activeSlotIndex = null;
   }
 
   // ── Product Modal ─────────────────────────────────────
   function resetUpload(){
-    uploadedImageUrl='';
-    document.getElementById('edit-image').value='';
-    document.getElementById('img-preview').style.display='none';
-    document.getElementById('img-preview').src='';
+    productImages = [];
+    activeSlotIndex = null;
     document.getElementById('img-file').value='';
     document.getElementById('upload-progress').style.display='none';
     document.getElementById('upload-status').style.display='none';
     document.getElementById('upload-status').style.color='#888';
+    renderImageSlots();
   }
 
   function openAddModal(){
@@ -619,7 +645,7 @@
     document.getElementById('modal').classList.add('open');
   }
 
-  function openEditModal(p){
+  async function openEditModal(p){
     document.getElementById('modal-title').textContent='Edit Product';
     document.getElementById('edit-id').value=p.id;
     document.getElementById('edit-name').value=p.name;
@@ -630,13 +656,17 @@
     document.getElementById('edit-status').value=p.status||'active';
     document.getElementById('edit-category').value=p.category_id;
     resetUpload();
-    if(p.image_url){
-      document.getElementById('edit-image').value=p.image_url;
-      uploadedImageUrl=p.image_url;
-      const preview=document.getElementById('img-preview');
-      preview.src=p.image_url; preview.style.display='block';
-    }
     document.getElementById('modal').classList.add('open');
+
+    // Pull the full product record so we get *all* saved images, not just the primary one
+    try {
+      const res = await fetch(`/api/products/${p.id}`);
+      const data = await res.json();
+      if(data.success && data.product.images && data.product.images.length){
+        productImages = data.product.images.slice(0, MAX_IMAGES);
+        renderImageSlots();
+      }
+    } catch(err){ /* image slots just stay empty, rest of the form still works */ }
   }
 
   function closeModal(){
@@ -658,7 +688,7 @@
       description:document.getElementById('edit-description').value.trim(),
       price:parseFloat(price),
       stock:parseInt(stock),
-      image_url:document.getElementById('edit-image').value,
+      images:productImages,
       condition:document.getElementById('edit-condition').value,
       status:document.getElementById('edit-status').value,
       category_id:parseInt(document.getElementById('edit-category').value),
