@@ -48,9 +48,9 @@
   .summary-row{display:flex;justify-content:space-between;font-size:14px;color:#555;margin-bottom:10px;}
   .summary-row.total{font-size:18px;font-weight:700;color:var(--ink);}
 
-  .pay-btn{width:100%;margin-top:20px;padding:16px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--pink),#a3185e);color:#fff;font-size:16px;font-weight:600;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s,box-shadow .2s;}
-  .pay-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(233,30,120,0.35);}
-  .pay-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .wa-btn{width:100%;margin-top:20px;padding:16px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,#25D366,#128C4A);color:#fff;font-size:16px;font-weight:600;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s,box-shadow .2s;}
+  .wa-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(37,211,102,0.35);}
+  .wa-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
   .secure-note{text-align:center;font-size:12px;color:#aaa;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;}
 
   .error-msg{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#dc2626;padding:12px 16px;border-radius:12px;font-size:14px;margin-bottom:16px;display:none;}
@@ -82,20 +82,18 @@
 </nav>
 
 <div class="page-header">
-  <div class="eyebrow">SECURE CHECKOUT</div>
+  <div class="eyebrow">CHECKOUT</div>
   <h1>Almost there!</h1>
-  <p>Fill in your details and we'll get your order to you</p>
+  <p>Fill in your details, then complete your order on WhatsApp</p>
 </div>
 
 <div id="main-content"></div>
 
 <script>
-  const CLOUDINARY_CLOUD = 'dy7sr9fph';
-  const CLOUDINARY_PRESET = 'luckykidies';
+  const OWNER_WHATSAPP = '2348094406347'; // +234 809 440 6347, international format, no + or spaces
 
   function formatPrice(p){ return '₦' + p.toLocaleString('en-NG'); }
 
-  // Resize/optimize a Cloudinary URL on the fly (f_auto,q_auto = best format/compression per browser)
   function cldUrl(url, width){
     if(!url || !url.includes('/upload/')) return url;
     return url.replace('/upload/', `/upload/f_auto,q_auto,w_${width}/`);
@@ -163,74 +161,10 @@
           <div class="summary-row"><span>Subtotal (${itemCount} items)</span><span>${formatPrice(subtotal)}</span></div>
           <div class="summary-row"><span>Delivery</span><span>TBD</span></div>
           <div class="summary-row total"><span>Total</span><span>${formatPrice(subtotal)}</span></div>
-          <button class="pay-btn" id="pay-btn" onclick="placeOrder()">
-            <i class="ti ti-building-bank"></i> Place Order
+          <button class="wa-btn" id="wa-btn" onclick="placeOrder()">
+            <i class="ti ti-brand-whatsapp"></i> Complete on WhatsApp
           </button>
-          <div class="secure-note"><i class="ti ti-lock"></i> Bank transfer · 100% secure</div>
-        </div>
-      </div>
-
-      <!-- Payment Modal -->
-      <div id="payment-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:100;align-items:center;justify-content:center;padding:20px;">
-        <div style="background:#fff;border-radius:28px;padding:36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;">
-          <div style="text-align:center;margin-bottom:24px;">
-            <div style="width:60px;height:60px;background:linear-gradient(135deg,#E91E78,#a3185e);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
-              <i class="ti ti-building-bank" style="font-size:28px;color:#fff;"></i>
-            </div>
-            <h2 style="font-family:'Fraunces',serif;font-size:22px;margin-bottom:6px;">Transfer Payment</h2>
-            <p style="color:#888;font-size:14px;">Send the exact amount to the account below</p>
-          </div>
-
-          <!-- Bank details -->
-          <div style="background:#fff8fc;border:2px solid #ffd9ea;border-radius:16px;padding:20px;margin-bottom:20px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-              <span style="font-size:13px;color:#888;">Bank</span>
-              <strong style="font-size:14px;">Moniepoint</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-              <span style="font-size:13px;color:#888;">Account Number</span>
-              <strong style="font-size:16px;color:#E91E78;letter-spacing:1px;">9157027909</strong>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
-              <span style="font-size:13px;color:#888;">Account Name</span>
-              <strong style="font-size:14px;">Donatus Favour Chidalu</strong>
-            </div>
-            <div style="border-top:1px solid #ffd9ea;padding-top:14px;text-align:center;">
-              <p style="font-size:12px;color:#888;margin-bottom:4px;">EXACT AMOUNT TO SEND</p>
-              <p id="modal-amount" style="font-size:28px;font-weight:700;color:#E91E78;margin:0;"></p>
-            </div>
-          </div>
-
-          <div style="background:#f9f9f9;border-radius:12px;padding:14px;margin-bottom:20px;text-align:center;">
-            <p style="font-size:12px;color:#888;margin-bottom:4px;">YOUR ORDER REFERENCE</p>
-            <p id="modal-ref" style="font-size:15px;font-weight:700;color:#1B1B1F;margin:0;letter-spacing:1px;"></p>
-          </div>
-
-          <!-- Screenshot upload -->
-          <div style="margin-bottom:20px;">
-            <label style="display:block;font-size:13px;font-weight:500;margin-bottom:10px;color:#555;">
-              Upload Payment Screenshot *
-            </label>
-            <div id="upload-area" style="border:2px dashed #e5e7eb;border-radius:14px;padding:24px;text-align:center;cursor:pointer;position:relative;background:#fafafa;">
-              <input type="file" id="screenshot-file" accept="image/*" style="position:absolute;inset:0;opacity:0;cursor:pointer;" onchange="handleScreenshot(this)">
-              <i class="ti ti-camera" style="font-size:32px;color:#E91E78;opacity:0.6;display:block;margin-bottom:8px;"></i>
-              <p style="font-size:14px;color:#888;margin:0;">Tap to upload your transfer receipt</p>
-            </div>
-            <img id="screenshot-preview" style="display:none;width:100%;border-radius:12px;margin-top:12px;" alt="Receipt preview">
-            <div id="upload-progress" style="display:none;margin-top:10px;">
-              <div style="height:4px;background:#f0f0f0;border-radius:2px;">
-                <div id="upload-bar" style="height:100%;background:linear-gradient(90deg,#E91E78,#a3185e);border-radius:2px;width:0%;transition:width .3s;"></div>
-              </div>
-              <p id="upload-status" style="font-size:12px;color:#888;text-align:center;margin-top:6px;"></p>
-            </div>
-          </div>
-
-          <div id="modal-err" style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#dc2626;padding:12px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;"></div>
-
-          <button id="confirm-btn" onclick="confirmPayment()" style="width:100%;padding:16px;border-radius:999px;border:none;cursor:pointer;background:linear-gradient(135deg,#E91E78,#a3185e);color:#fff;font-size:15px;font-weight:600;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;">
-            <i class="ti ti-check"></i> I've Paid — Submit Order
-          </button>
-          <button onclick="closeModal()" style="width:100%;margin-top:10px;padding:12px;border-radius:999px;border:1px solid #e5e7eb;background:transparent;font-size:14px;color:#888;cursor:pointer;font-family:'Outfit',sans-serif;">Cancel</button>
+          <div class="secure-note"><i class="ti ti-message-circle"></i> You'll chat directly with us to finish your order</div>
         </div>
       </div>`;
   }
@@ -243,12 +177,29 @@
     setTimeout(() => el.style.display = 'none', 4000);
   }
 
-  let currentOrderRef = '';
-  let screenshotUrl = '';
-  let pendingOrder = null;
-
   function makeOrderRef(){
     return 'LK-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+  }
+
+  function buildWhatsAppMessage(order, orderRef){
+    const lines = [];
+    lines.push(`Hi! I'd like to complete an order from Lucky Kidies Wears 🛍️`);
+    lines.push(``);
+    lines.push(`*Order Ref:* ${orderRef}`);
+    lines.push(`*Name:* ${order.customer_name}`);
+    lines.push(`*Phone:* ${order.customer_phone}`);
+    lines.push(`*Email:* ${order.customer_email}`);
+    lines.push(`*Delivery Address:* ${order.customer_address}`);
+    lines.push(``);
+    lines.push(`*Items:*`);
+    order.items.forEach(item => {
+      lines.push(`• ${item.name} x${item.quantity} — ${formatPrice(item.price * item.quantity)}`);
+    });
+    lines.push(``);
+    lines.push(`*Total: ${formatPrice(order.total)}*`);
+    lines.push(``);
+    lines.push(`Please send your payment details so I can complete the order. Thank you!`);
+    return lines.join('\n');
   }
 
   async function placeOrder(){
@@ -272,117 +223,43 @@
 
     const cart = getCart();
     const total = cart.reduce((s,i) => s + i.price * i.quantity, 0);
+    const orderRef = makeOrderRef();
 
-    // Nothing is saved to the server yet, and no emails fire here —
-    // this just reserves a reference number and shows payment instructions.
-    // The real order is only created once payment proof is actually submitted.
-    currentOrderRef = makeOrderRef();
-    pendingOrder = { customer_name: name, customer_email: email, customer_phone: phone, customer_address: address, total, items: cart };
-
-    document.getElementById('modal-amount').textContent = formatPrice(total);
-    document.getElementById('modal-ref').textContent = currentOrderRef;
-    document.getElementById('payment-modal').style.display = 'flex';
-  }
-
-  function closeModal(){
-    document.getElementById('payment-modal').style.display = 'none';
-  }
-
-  function handleScreenshot(input){
-    const file = input.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      const preview = document.getElementById('screenshot-preview');
-      preview.src = e.target.result;
-      preview.style.display = 'block';
+    const order = {
+      customer_name: name,
+      customer_email: email,
+      customer_phone: phone,
+      customer_address: address,
+      total,
+      items: cart,
+      payment_ref: orderRef
     };
-    reader.readAsDataURL(file);
-    uploadScreenshot(file);
-  }
 
-  async function uploadScreenshot(file){
-    const progress = document.getElementById('upload-progress');
-    const bar = document.getElementById('upload-bar');
-    const status = document.getElementById('upload-status');
-
-    progress.style.display = 'block';
-    status.textContent = 'Uploading...';
-    bar.style.width = '0%';
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', CLOUDINARY_PRESET);
-
-    let fakeProgress = 0;
-    const interval = setInterval(() => {
-      fakeProgress = Math.min(fakeProgress + 10, 85);
-      bar.style.width = fakeProgress + '%';
-    }, 200);
-
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      clearInterval(interval);
-      const data = await res.json();
-      if(data.secure_url){
-        screenshotUrl = data.secure_url;
-        bar.style.width = '100%';
-        status.textContent = '✅ Screenshot uploaded!';
-        status.style.color = '#16a34a';
-      } else {
-        throw new Error('Upload failed');
-      }
-    } catch(err){
-      clearInterval(interval);
-      status.textContent = '❌ Upload failed. Try again.';
-      status.style.color = '#dc2626';
-    }
-  }
-
-  async function confirmPayment(){
-    if(!screenshotUrl){
-      const err = document.getElementById('modal-err');
-      err.textContent = 'Please upload your payment screenshot first.';
-      err.style.display = 'block';
-      return;
-    }
-
-    const btn = document.getElementById('confirm-btn');
+    const btn = document.getElementById('wa-btn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="ti ti-loader"></i> Submitting...';
+    btn.innerHTML = '<i class="ti ti-loader"></i> Saving order...';
 
     try {
-      const res = await fetch('/api/orders', {
+      // Save the order as pending so it shows up in admin for tracking
+      await fetch('/api/orders', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ ...pendingOrder, screenshot_url: screenshotUrl, payment_ref: currentOrderRef })
+        body: JSON.stringify(order)
       });
-
-      const data = await res.json();
-
-      if(!data.success){
-        const err = document.getElementById('modal-err');
-        err.textContent = data.error || 'Something went wrong. Please try again.';
-        err.style.display = 'block';
-        btn.disabled = false;
-        btn.innerHTML = '<i class="ti ti-check"></i> I\'ve Paid — Submit Order';
-        return;
-      }
-
-      // Clear cart
-      localStorage.removeItem('lk_cart');
-
-      // Redirect to processing page
-      window.location.href = `/order-processing.html?ref=${data.orderRef}`;
-
-    } catch(err){
-      btn.disabled = false;
-      btn.innerHTML = '<i class="ti ti-check"></i> I\'ve Paid — Submit Order';
+    } catch(err) {
+      // Even if saving fails, still let the customer reach WhatsApp —
+      // don't block the sale over a logging issue.
+      console.error('Order save failed:', err);
     }
+
+    // Clear cart now that the order has been handed off
+    localStorage.removeItem('lk_cart');
+
+    // Build WhatsApp deep link with the order pre-filled
+    const message = encodeURIComponent(buildWhatsAppMessage(order, orderRef));
+    const waUrl = `https://wa.me/${OWNER_WHATSAPP}?text=${message}`;
+
+    window.location.href = waUrl;
   }
 
   render();

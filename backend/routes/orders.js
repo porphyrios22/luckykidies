@@ -15,16 +15,15 @@ router.post('/', async (req, res) => {
     if (!customer_name || !customer_email || !customer_phone || !customer_address || !total || !items?.length) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
-    if (!screenshot_url) {
-      return res.status(400).json({ success: false, error: 'Payment screenshot is required' });
-    }
+    // screenshot_url is now optional — orders placed via the WhatsApp checkout
+    // won't have one yet; it can be attached later if needed.
 
     const orderRef = payment_ref || ('LK-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase());
 
     const orderResult = db.prepare(`
       INSERT INTO orders (customer_name, customer_email, customer_phone, customer_address, total, status, payment_ref, screenshot_url)
       VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
-    `).run(customer_name, customer_email, customer_phone, customer_address, total, orderRef, screenshot_url);
+    `).run(customer_name, customer_email, customer_phone, customer_address, total, orderRef, screenshot_url || null);
 
     const orderId = orderResult.lastInsertRowid;
 
