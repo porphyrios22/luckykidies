@@ -51,7 +51,6 @@ router.post('/', async (req, res) => {
     };
 
     sendOwnerAlert(orderForEmail).catch(e => console.error('Owner alert error:', e));
-    sendOrderReceived(orderForEmail).catch(e => console.error('Order received email error:', e));
 
     res.json({ success: true, orderId, orderRef });
 
